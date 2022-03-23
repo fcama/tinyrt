@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <pcg32.h>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -31,7 +32,9 @@ int main() {
         return -1;
     }
 
-    std::cout << "Hello, World!" << std::endl;
+    pcg32 rng;
+    rng.seed(2);
+    std::cout << "Hello, World! " << rng.nextFloat() << std::endl;
 
     return 0;
 }
