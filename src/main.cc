@@ -17,6 +17,8 @@
 
 #include "shader_program.h"
 
+#include "camera.h"
+
 static void GlfwErrorCallback(int error, const char* description)
 {
     (void)fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -59,7 +61,9 @@ int main() {
     auto device = rtcNewDevice(nullptr);
 
 	ShaderProgram sp("shaders/vs.vertex", "shaders/fs.frag");
-	//sp.SetInt("myint", 0);
+	//sp.setInt("myint", 0);
+
+	Camera cam;
 
     pcg32 rng;
     rng.seed(2);

@@ -111,6 +111,10 @@ struct pcg32 {
         return x.f - 1.0f;
     }
 
+	float nextFloat(float min, float max) {
+		return min + (max - min) * this->nextFloat();
+	}
+
     /**
      * \brief Generate a double precision floating point value on the interval [0, 1)
      *

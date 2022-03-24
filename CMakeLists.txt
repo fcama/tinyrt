@@ -6,7 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 message("Build type: ${CMAKE_BUILD_TYPE}")
 
-add_executable(${PROJECT_NAME} src/main.cc src/shader_program.cc src/shader_program.h src/ray.cc src/ray.h)
+add_executable(${PROJECT_NAME} src/main.cc
+        src/shader_program.cc
+        src/shader_program.h
+        src/ray.cc
+        src/ray.h
+        src/camera.cc
+        src/camera.h src/common.h)
+
 add_subdirectory(external)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
