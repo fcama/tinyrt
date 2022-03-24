@@ -6,6 +6,11 @@
 #include <GLFW/glfw3.h>
 #include <pcg32.h>
 
+#include <stb/stb_image_write.h>
+#include <stb/stb_image.h>
+
+#include <embree3/rtcore.h>
+
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -31,6 +36,8 @@ int main() {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    auto device = rtcNewDevice(nullptr);
 
     pcg32 rng;
     rng.seed(2);
