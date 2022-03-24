@@ -4,8 +4,12 @@ project(tinyrt)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+message("Build type: ${CMAKE_BUILD_TYPE}")
+
+add_executable(${PROJECT_NAME} src/main.cc src/shader_program.cc src/shader_program.h src/ray.cc src/ray.h)
 add_subdirectory(external)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
 
 # Include paths
 include_directories(external/)
@@ -15,6 +19,8 @@ include_directories(external/glad/include)
 include_directories(external/imgui)
 include_directories(external/pcg32)
 include_directories(external/embree/include)
+
+set(root_folder ${CMAKE_CURRENT_LIST_DIR})
 
 # External Libraries
 find_package(OpenGL REQUIRED)
