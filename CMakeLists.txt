@@ -7,12 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message("Build type: ${CMAKE_BUILD_TYPE}")
 
 add_executable(${PROJECT_NAME} src/main.cc
+
+        src/common.h
         src/shader_program.cc
         src/shader_program.h
         src/ray.cc
         src/ray.h
         src/camera.cc
-        src/camera.h src/common.h)
+        src/camera.h
+        src/material.cc
+        src/material.h)
 
 add_subdirectory(external)
 

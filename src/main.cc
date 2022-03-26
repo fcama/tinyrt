@@ -60,7 +60,7 @@ int main() {
 
     auto device = rtcNewDevice(nullptr);
 
-	ShaderProgram sp("shaders/vs.vertex", "shaders/fs.frag");
+	ShaderProgram sp("shaders/vs.vert", "shaders/fs.frag");
 	//sp.setInt("myint", 0);
 
 	Camera cam;
