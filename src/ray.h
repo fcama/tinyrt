@@ -13,7 +13,7 @@ class Ray {
   	Ray(const glm::vec3 &origin, const glm::vec3 &direction, float time = 0)
 		: o_(origin), d_(direction), t_(time) {};
 
-  	[[nodiscard]] glm::vec3 At(float t) const;
+  	[[nodiscard]] glm::vec3 at(float t) const;
 
 	glm::vec3 o_, d_;
 	float t_;

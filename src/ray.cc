@@ -4,6 +4,6 @@
 
 #include "ray.h"
 
-glm::vec3 Ray::At(float t) const {
+glm::vec3 Ray::at(float t) const {
 	return o_ + t_*d_;
 }

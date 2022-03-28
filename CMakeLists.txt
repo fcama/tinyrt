@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message("Build type: ${CMAKE_BUILD_TYPE}")
 
 add_executable(${PROJECT_NAME} src/main.cc
-
         src/common.h
         src/shader_program.cc
         src/shader_program.h
@@ -16,7 +15,9 @@ add_executable(${PROJECT_NAME} src/main.cc
         src/camera.cc
         src/camera.h
         src/material.cc
-        src/material.h)
+        src/material.h
+        src/model.cc
+        src/model.h src/render_context.cc src/render_context.h)
 
 add_subdirectory(external)
 
@@ -39,5 +40,9 @@ find_package(glfw3 3.3 REQUIRED)
 
 set(embree_DIR external/embree/lib/cmake/embree-3.13.3)
 find_package(embree REQUIRED)
+find_package(OpenMP REQUIRED)
+if (OPENMP_FOUND)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
 target_link_libraries(${PROJECT_NAME} glad OpenGL dl glfw imgui pcg32 stb tinyobjloader embree)

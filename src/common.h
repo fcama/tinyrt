@@ -9,7 +9,10 @@
 #include <glm/glm.hpp>
 #include <pcg32/pcg32.h>
 
-constexpr float kEpsilon = 1e-04f;
+inline void GlfwErrorCallback(int error, const char* description)
+{
+	(void)fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
 
 inline glm::vec3 RandomInUnitSphere(pcg32 &rng) {
 	while (true) {
