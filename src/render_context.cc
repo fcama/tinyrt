@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include "render_context.h"
-
+#include "common.h"
+#include <memory>
 
 
 RenderContext::RenderContext(int width, int height, int comp, int n_threads, int max_depth)
@@ -14,10 +15,6 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	camera_ = Camera(glm::vec3(0.0, 1.0, 5.15), glm::vec3(0,1,0), glm::vec3(0,1,0), 26.99, aspect_ratio_);
 	model_ = LoadObjFile("models/cornellbox/cornellbox.obj", "models/cornellbox");
 
-//	for (int i = 0; i < num_threads_; ++i)
-//	{
-//		rng_.push_back(pcg32());
-//	}
 	rng_.resize(num_threads_);
 	std::vector<uint64_t> initstate(num_threads_, PCG32_DEFAULT_STATE);
 	std::vector<uint64_t> initseq(num_threads_);
@@ -60,25 +57,24 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 }
 
 void RenderContext::render(std::vector<float> &target) {
-	#pragma omp parallel for schedule(dynamic) num_threads(num_threads_) default(none) shared(target)
+
+#pragma omp parallel for schedule(dynamic) num_threads(num_threads_) default(none) shared(target)
 	for (int j = height_-1; j >= 0; --j)
 	{
 		for (int i = 0; i < width_; ++i)
 		{
 			glm::vec3 color(0);
 
-			int threadN = 0;//omp_get_thread_num();
-			//std::cout << omp_get_thread_num() << std::endl;
-			auto u = float(i + rng_[threadN].nextFloat()) / (width_-1);
-			auto v = float(j + rng_[threadN].nextFloat()) / (height_-1);
+			auto u = float(i + rng_[omp_get_thread_num()].nextFloat()) / (width_-1);
+			auto v = float(j + rng_[omp_get_thread_num()].nextFloat()) / (height_-1);
 
 			Ray r = camera_.getRay(u, v);
 
 			// Switch here
-			color += rayColor(rng_[threadN], r);
-			//color += rayAO(rng_[omp_get_thread_num()], r);
-			//color += rayNormal(rng_[omp_get_thread_num()], r);
-			//color += rayBarycentrics(rng_[omp_get_thread_num()], r);
+			color = rayColor(rng_[omp_get_thread_num()], r);
+			//color = rayAO(rng_[omp_get_thread_num()], r);
+			//color = rayNormal(rng_[omp_get_thread_num()], r);
+			//color = rayBarycentrics(rng_[omp_get_thread_num()], r);
 
 
 			int index = ((height_-1-j) * (width_) + i) * components_;
@@ -138,6 +134,173 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 
 	return glm::vec3(0); // exceeded recursion
 }
+
+glm::vec3 RenderContext::rayNormal(pcg32 &rng, const Ray& ray)
+{
+	RTCRayHit rayhit;
+	rayhit.ray.org_x = ray.o_.x;
+	rayhit.ray.org_y = ray.o_.y;
+	rayhit.ray.org_z = ray.o_.z;
+
+	rayhit.ray.dir_x = ray.d_.x;
+	rayhit.ray.dir_y = ray.d_.y;
+	rayhit.ray.dir_z = ray.d_.z;
+	rayhit.ray.tnear  = 0.f;
+	rayhit.ray.tfar   = std::numeric_limits<float>::infinity();
+	rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+
+	RTCIntersectContext context;
+	rtcInitIntersectContext(&context);
+
+	rtcIntersect1(scene_, &context, &rayhit);
+
+	// Miss Shader
+	if (rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
+	{
+		return glm::vec3(0);
+	}
+
+	const glm::vec3 geomNormal  = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+	const glm::vec3 shadingNorm = graphics::CalcShadingNormal(glm::vec3(rayhit.ray.dir_x, rayhit.ray.dir_y, rayhit.ray.dir_z), geomNormal);
+	return glm::vec3(0.5) * glm::vec3(shadingNorm.x + 1, shadingNorm.y + 1, shadingNorm.z + 1);
+}
+
+glm::vec3 RenderContext::rayBarycentrics(pcg32 &rng, const Ray& ray)
+{
+	RTCRayHit rayhit;
+	rayhit.ray.org_x = ray.o_.x;
+	rayhit.ray.org_y = ray.o_.y;
+	rayhit.ray.org_z = ray.o_.z;
+
+	rayhit.ray.dir_x = ray.d_.x;
+	rayhit.ray.dir_y = ray.d_.y;
+	rayhit.ray.dir_z = ray.d_.z;
+	rayhit.ray.tnear  = 0.f;
+	rayhit.ray.tfar   = std::numeric_limits<float>::infinity();
+	rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+
+	RTCIntersectContext context;
+	rtcInitIntersectContext(&context);
+
+	rtcIntersect1(scene_, &context, &rayhit);
+
+	// Miss Shader
+	if (rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
+	{
+		return glm::vec3(0);
+	}
+
+	glm::vec3 barycentrics = glm::vec3(1.0 - rayhit.hit.u - rayhit.hit.v, rayhit.hit.u, rayhit.hit.v);
+	return barycentrics;
+}
+
+glm::vec3 RenderContext::rayAO(pcg32 &rng, const Ray& ray)
+{
+	// Settings
+	static constexpr int kAoSamples = 8;
+
+	RTCRayHit rayhit;
+	rayhit.ray.org_x = ray.o_.x;
+	rayhit.ray.org_y = ray.o_.y;
+	rayhit.ray.org_z = ray.o_.z;
+
+	rayhit.ray.dir_x = ray.d_.x;
+	rayhit.ray.dir_y = ray.d_.y;
+	rayhit.ray.dir_z = ray.d_.z;
+	rayhit.ray.tnear  = 0.f;
+	rayhit.ray.tfar   = std::numeric_limits<float>::infinity();
+	rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+
+	RTCIntersectContext context;
+	rtcInitIntersectContext(&context);
+
+	rtcIntersect1(scene_, &context, &rayhit);
+
+	// Miss Shader
+	if (rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID)
+	{
+		return glm::vec3(0);
+	}
+
+	const glm::vec3 p = glm::vec3(rayhit.ray.org_x + rayhit.ray.tfar * rayhit.ray.dir_x,
+								  rayhit.ray.org_y + rayhit.ray.tfar * rayhit.ray.dir_y,
+								  rayhit.ray.org_z + rayhit.ray.tfar * rayhit.ray.dir_z);
+
+	const glm::vec3 geomNormal  = glm::vec3(rayhit.hit.Ng_x, rayhit.hit.Ng_y, rayhit.hit.Ng_z);
+	const glm::vec3 shadingNorm = graphics::CalcShadingNormal(glm::vec3(rayhit.ray.dir_x, rayhit.ray.dir_y, rayhit.ray.dir_z), geomNormal);
+
+	unsigned aoIntensity {0};
+
+	assert(kAoSamples % 8 == 0);
+
+	// SIMD version
+	static constexpr int simdSize = 8;
+	for (size_t iter = 0; iter < kAoSamples; iter += simdSize)
+	{
+		std::unique_ptr<RTCRay8> rayVector = std::make_unique<RTCRay8>();
+		static const int valid[simdSize] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
+		for (int ao = 0; ao < simdSize; ++ao)
+		{
+			glm::vec3 d = graphics::GetCosHemisphereSample(rng, shadingNorm);
+
+			rayVector->org_x[ao] = p.x;
+			rayVector->org_y[ao] = p.y;
+			rayVector->org_z[ao] = p.z;
+
+			rayVector->dir_x[ao] = d.x;
+			rayVector->dir_y[ao] = d.y;
+			rayVector->dir_z[ao] = d.z;
+
+			rayVector->tnear[ao] = kEpsilon;
+			rayVector->tfar [ao] = 1.4f;
+		}
+
+		RTCIntersectContext aoContext;
+		aoContext.flags = RTC_INTERSECT_CONTEXT_FLAG_INCOHERENT;
+		rtcInitIntersectContext(&aoContext);
+
+		rtcOccluded8(valid, scene_, &aoContext, rayVector.get());
+
+		for (int ao = 0; ao < simdSize; ++ao)
+		{
+			if (rayVector->tfar[ao] >= 0.f)
+			{
+				aoIntensity += 1;
+			}
+		}
+	}
+
+	// Sequential Version
+	// for (int ao = 0; ao < aoSamples; ++ao)
+	// {
+	//     RTCRay aoRay;
+	//     aoRay.org_x = p.x;
+	//     aoRay.org_y = p.y;
+	//     aoRay.org_z = p.z;
+	//     glm::vec3 d = graphics::getCosHemisphereSample(rng, shadingNorm);
+
+	//     aoRay.dir_x = d.x,
+	//     aoRay.dir_y = d.y,
+	//     aoRay.dir_z = d.z;
+	//     aoRay.tnear = epsilon;
+	//     aoRay.tfar  = 1.4f;
+
+	//     RTCIntersectContext context;
+	//     rtcInitIntersectContext(&context);
+
+	//     rtcOccluded1(scene, &context, &aoRay);
+
+	//     // hit found
+	//     if (aoRay.tfar >= 0.f)
+	//     {
+	//         aoIntensity += 1;
+	//     }
+	// }
+
+	return glm::vec3(aoIntensity / (float)kAoSamples);
+}
+
 void RenderContext::present(std::vector<float> &present_buffer,
 							const std::vector<float> &accumulation_buffer,
 							const uint32_t frame) {

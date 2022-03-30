@@ -20,7 +20,7 @@
 
 int main() {
 	int width = 900; int height = 900; int components = 3;
-	RenderContext context(width, height, components, 2);
+	RenderContext context(width, height, components, 16);
 
 	std::vector<float> accumulation_buffer(width * height * components, 0.f); // TODO resizable
 	std::vector<float> present_buffer(width * height * components, 0.f);
@@ -36,7 +36,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(800, 800, "tinyrt", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(context.width_, context.height_, "tinyrt", nullptr, nullptr);
     if (window == nullptr) { return 1; }
 
     glfwMakeContextCurrent(window);
