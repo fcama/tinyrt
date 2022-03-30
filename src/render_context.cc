@@ -300,15 +300,3 @@ glm::vec3 RenderContext::rayAO(pcg32 &rng, const Ray& ray)
 
 	return glm::vec3(aoIntensity / (float)kAoSamples);
 }
-
-void RenderContext::present(std::vector<float> &present_buffer,
-							const std::vector<float> &accumulation_buffer,
-							const uint32_t frame) {
-
-#pragma omp parallel for default(none) shared(present_buffer, accumulation_buffer, frame)
-	for (int i = 0; i < accumulation_buffer.size(); ++i)
-	{
-		// Apply gamma correction + sample averaging
-		present_buffer[i] = sqrt(accumulation_buffer[i] / (float)frame); //(float)(frame * spp));
-	}
-}

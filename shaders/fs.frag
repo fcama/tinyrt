@@ -4,9 +4,12 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform int frame;
 
 void main()
-{ 
-    FragColor = texture(screenTexture, vec2(TexCoords.x, -TexCoords.y));
-    //FragColor = vec4(1, 1, 1, 1);
+{
+    vec3 pixel_color = texture(screenTexture, TexCoords).rgb;
+
+    // Gamma Correction + Averaging
+    FragColor = vec4(sqrt(pixel_color / frame), 1);
 }

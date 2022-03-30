@@ -23,7 +23,6 @@ int main() {
 	RenderContext context(width, height, components, 16);
 
 	std::vector<float> accumulation_buffer(width * height * components, 0.f); // TODO resizable
-	std::vector<float> present_buffer(width * height * components, 0.f);
 
 	// Setup window
     (void)glfwSetErrorCallback(GlfwErrorCallback);
@@ -68,20 +67,20 @@ int main() {
 	unsigned int texture_colorbuffer;
 	glGenTextures(1, &texture_colorbuffer);
 	glBindTexture(GL_TEXTURE_2D, texture_colorbuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, context.width_, context.height_, 0, GL_RGB, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, context.width_, context.height_, 0, GL_RGB, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	float quadVertices[] = {
 		// positions   // texCoords
-		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f,  1.0f,  0.0f, -1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
 		1.0f, -1.0f,  1.0f, 0.0f,
 
-		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f,  1.0f,  0.0f, -1.0f,
 		1.0f, -1.0f,  1.0f, 0.0f,
-		1.0f,  1.0f,  1.0f, 1.0f
+		1.0f,  1.0f,  1.0f, -1.0f
 	};
 
 	// screen quad VAO
@@ -130,9 +129,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		context.render(accumulation_buffer);
-		context.present(present_buffer, accumulation_buffer, frame);
+		sp.setInt("frame", frame);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, context.width_, context.height_, 0, GL_RGB, GL_FLOAT, (const void*)present_buffer.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, context.width_, context.height_, 0, GL_RGB, GL_FLOAT, (const void*)accumulation_buffer.data());
 
 		glBindVertexArray(quadVAO);
 		glBindTexture(GL_TEXTURE_2D, texture_colorbuffer);

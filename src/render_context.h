@@ -19,7 +19,6 @@ class RenderContext {
 	RenderContext(int width, int height, int comp  = 3, int n_threads = omp_get_max_threads(), int max_depth = 5);
 
 	void render(std::vector<float> &target);
-	void present(std::vector<float> &present_buffer, const std::vector<float> &accumulation_buffer, const uint32_t frame);
 
 	glm::vec3 rayColor(pcg32 &rng, const Ray& ray);
 	glm::vec3 rayNormal(pcg32 &rng, const Ray& ray);
