@@ -13,6 +13,7 @@
 #include <omp.h>
 
 constexpr float kEpsilon = 1e-04f;
+enum class RenderOutput {CAMERA, NORMALS, BARYCENTRICS, AMBIENT_OCCLUSION };
 
 class RenderContext {
  public:
@@ -34,7 +35,7 @@ class RenderContext {
 	RTCScene scene_;
 	std::vector<pcg32> rng_;
 
-
+	RenderOutput current_output_;
 
 };
 

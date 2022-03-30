@@ -54,6 +54,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	rtcSetSceneBuildQuality(scene_, RTC_BUILD_QUALITY_HIGH);
 	rtcCommitScene(scene_);
 
+	current_output_ = RenderOutput::CAMERA;
 }
 
 void RenderContext::render(std::vector<float> &target) {
@@ -71,10 +72,29 @@ void RenderContext::render(std::vector<float> &target) {
 			Ray r = camera_.getRay(u, v);
 
 			// Switch here
-			color = rayColor(rng_[omp_get_thread_num()], r);
-			//color = rayAO(rng_[omp_get_thread_num()], r);
-			//color = rayNormal(rng_[omp_get_thread_num()], r);
-			//color = rayBarycentrics(rng_[omp_get_thread_num()], r);
+			switch (current_output_)
+			{
+				case(RenderOutput::CAMERA) :
+				{
+					color = rayColor(rng_[omp_get_thread_num()], r);
+					break;
+				}
+				case(RenderOutput::NORMALS) :
+				{
+					color = rayNormal(rng_[omp_get_thread_num()], r);
+					break;
+				}
+				case(RenderOutput::BARYCENTRICS) :
+				{
+					color = rayBarycentrics(rng_[omp_get_thread_num()], r);
+					break;
+				}
+				case(RenderOutput::AMBIENT_OCCLUSION) :
+				{
+					color = rayAO(rng_[omp_get_thread_num()], r);
+					break;
+				}
+			}
 
 
 			int index = ((height_-1-j) * (width_) + i) * components_;

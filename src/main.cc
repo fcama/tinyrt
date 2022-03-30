@@ -118,6 +118,27 @@ int main() {
 		ImGui::Begin("Performance Metrics");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Text("Frame count: %d", frame);
+
+		ImGui::Text("\nDebug View");
+		if(ImGui::RadioButton("Camera", context.current_output_ == RenderOutput::CAMERA))
+		{
+			context.current_output_ = RenderOutput::CAMERA;
+			frame = 1;
+			std::fill(accumulation_buffer.begin(), accumulation_buffer.end(), 0.f);
+		}
+		else if(ImGui::RadioButton("Normals", context.current_output_ == RenderOutput::NORMALS))
+		{
+			context.current_output_ = RenderOutput::NORMALS;
+			frame = 1;
+			std::fill(accumulation_buffer.begin(), accumulation_buffer.end(), 0.f);
+		}
+		else if(ImGui::RadioButton("Barycentrics", context.current_output_ == RenderOutput::BARYCENTRICS))
+		{
+			context.current_output_ = RenderOutput::BARYCENTRICS;
+			frame = 1;
+			std::fill(accumulation_buffer.begin(), accumulation_buffer.end(), 0.f);
+		}
+
 		ImGui::End();
 
 		ImGui::Render();
@@ -129,6 +150,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		context.render(accumulation_buffer);
+
 		sp.setInt("frame", frame);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, context.width_, context.height_, 0, GL_RGB, GL_FLOAT, (const void*)accumulation_buffer.data());
