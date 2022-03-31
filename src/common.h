@@ -8,6 +8,7 @@
 #include <cmath>
 #include <glm/glm.hpp>
 #include <pcg32/pcg32.h>
+#include <cstdio>
 
 inline void GlfwErrorCallback(int error, const char* description)
 {
