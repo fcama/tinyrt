@@ -1,6 +1,6 @@
 # tinyrt
 
-Tinyrt is a compact path tracer written in modern C++ supporting of real-time features.
+Tinyrt is a compact path tracer written in modern C++ supporting real-time features.
 
 <img src="https://user-images.githubusercontent.com/70849941/161048235-8ff199fa-b47b-4706-94ff-48bd29849e48.png" width="700" height="700">
 
