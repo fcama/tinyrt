@@ -22,7 +22,7 @@ bool EvaluateMaterial(pcg32 &rng,
 	const glm::vec3 kGeometryNormal = glm::vec3(ray_hit.hit.Ng_x, ray_hit.hit.Ng_y, ray_hit.hit.Ng_z);
 	const glm::vec3 kShadingNormal = graphics::CalcShadingNormal(glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z), kGeometryNormal);
 
-	color = glm::vec3(mat.tiny_material_->diffuse[0], mat.tiny_material_->diffuse[1], mat.tiny_material_->diffuse[2]);
+	color = mat.evaluatePattern(ray_hit);
 
 	glm::vec3 hit_point = glm::vec3(ray_hit.ray.org_x + ray_hit.ray.tfar * ray_hit.ray.dir_x,
 								  ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
@@ -80,4 +80,33 @@ bool EvaluateMaterial(pcg32 &rng,
 
 	scattered = Ray(hit_point, direction);
 	return true;
+}
+
+glm::vec3 Material::evaluatePattern(const RTCRayHit &ray_hit) const {
+	auto diffuse = glm::vec3(tiny_material_->diffuse[0], tiny_material_->diffuse[1], tiny_material_->diffuse[2]);
+	auto ambient = glm::vec3(tiny_material_->ambient[0], tiny_material_->ambient[1], tiny_material_->ambient[2]);
+
+	switch (pattern_type_) {
+		case (PatternType::SOLID) :
+		{
+			return diffuse;
+		}
+		case (PatternType::CHECKERBOARD) :
+		{
+			auto &odd = diffuse;
+			auto &even = ambient;
+
+//			auto &u = ray_hit.hit.u;
+//			auto &v = ray_hit.hit.v;
+			glm::vec3 hit_point = glm::vec3(ray_hit.ray.org_x + ray_hit.ray.tfar * ray_hit.ray.dir_x,
+											ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
+											ray_hit.ray.org_z + ray_hit.ray.tfar * ray_hit.ray.dir_z);
+
+			auto sines = sin(10*hit_point.x)*sin(10*hit_point.y)*sin(10*hit_point.z);
+			if (sines < 0)
+				return odd;
+			else
+				return even;
+		}
+	}
 }

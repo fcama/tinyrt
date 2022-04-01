@@ -62,8 +62,14 @@ Model LoadObjFile(const char* filename, const char* basepath, bool triangulate)
 				m.indices_.push_back(idx.vertex_index);
 			}
 
-
-			if (shape.name == "light_Mesh")
+			if (shape.name == "floor_Mesh" || shape.name ==  "frontWall_Mesh" || shape.name ==  "ceiling_Mesh")
+			{
+				Material mat(MatType::DIFFUSE,
+							 &m.tiny_materials_.at(shape.mesh.material_ids[f]),
+							 PatternType::CHECKERBOARD);
+				m.materials_.push_back(mat);
+			}
+			else if (shape.name == "light_Mesh")
 			{
 				Material mat(MatType::EMISSIVE, &m.tiny_materials_.at(shape.mesh.material_ids[f]));
 				m.materials_.push_back(mat);

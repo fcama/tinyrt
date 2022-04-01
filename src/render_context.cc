@@ -22,6 +22,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	}
 	for (int i = 0; i < num_threads_; ++i) {
 		rng_[i].seed(initstate[i], initseq[i]);
+		//rng_[i].init(initstate[i], initseq[i]);
 	}
 
 	// Embree code
@@ -283,6 +284,10 @@ void RenderContext::render(std::vector<float> &target) {
 		}
 		case (RenderOutput::BARYCENTRICS) : {
 			render(target, [&](pcg32 &rng, Ray &r) { return rayBarycentrics(rng, r); });
+			break;
+		}
+		case (RenderOutput::AMBIENT_OCCLUSION) : {
+			render(target, [&](pcg32 &rng, Ray &r) { return rayAO(rng, r); });
 			break;
 		}
 

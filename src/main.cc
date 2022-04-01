@@ -197,13 +197,11 @@ int main() {
 			context.current_output_ = RenderOutput::BARYCENTRICS;
 			context.accumulation_frames = 1;
 			std::fill(context.accumulation_buffer.begin(), context.accumulation_buffer.end(), 0.f);
+		} else if (ImGui::RadioButton("Ambient Occlusion", context.current_output_ == RenderOutput::AMBIENT_OCCLUSION)) {
+			context.current_output_ = RenderOutput::AMBIENT_OCCLUSION;
+			context.accumulation_frames = 1;
+			std::fill(context.accumulation_buffer.begin(), context.accumulation_buffer.end(), 0.f);
 		}
-
-		ImGui::SliderFloat3("front", &(context.camera_.front_[0]), 0.0f, 1.0f);
-		ImGui::SliderFloat3("right", &(context.camera_.right_[0]), 0.0f, 1.0f);
-		ImGui::SliderFloat3("up", &(context.camera_.up_[0]), 0.0f, 1.0f);
-		context.camera_.updateCameraBase();
-
 		ImGui::End();
 
 		ImGui::Render();

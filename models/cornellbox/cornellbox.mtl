@@ -34,3 +34,8 @@ newmtl tallBox
 newmtl light
     Kd 1.0 1.0 1.0
     Ke 4 4 4
+
+newmtl checker
+    Ka 0.2 0.2 0.2
+    Kd 1.0 1.0 1.0
+

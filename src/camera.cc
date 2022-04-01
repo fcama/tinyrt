@@ -63,6 +63,8 @@ void Camera::processKeyboard(CameraMovement movement, float delta_time) {
 		origin_ -= right_ * velocity;
 	if (movement == CameraMovement::RIGHT)
 		origin_ += right_ * velocity;
+
+	updateCameraBase();
 }
 
 void Camera::processMouseMovement(float xoffset, float yoffset, bool constrain_pitch) {

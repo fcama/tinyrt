@@ -12,14 +12,19 @@
 #include "ray.h"
 
 enum class MatType { DIFFUSE = 0, REFLECTIVE, DIELECTRIC, EMISSIVE, INVALID };
+enum class PatternType { SOLID, CHECKERBOARD };
 
 class Material {
  public:
-	Material(MatType material_type, const tinyobj::material_t *tiny_material)
-		: material_type_(material_type), tiny_material_(tiny_material) {}
+	Material(MatType material_type, const tinyobj::material_t *tiny_material, PatternType pattern_type = PatternType::SOLID)
+		: material_type_(material_type), tiny_material_(tiny_material), pattern_type_(pattern_type) {}
 
 	MatType material_type_;
 	const tinyobj::material_t *tiny_material_;
+	PatternType pattern_type_;
+
+
+	glm::vec3 evaluatePattern(const RTCRayHit &ray_hit) const;
 };
 
 bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &color);
