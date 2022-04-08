@@ -17,7 +17,9 @@ add_executable(${PROJECT_NAME} src/main.cc
         src/material.cc
         src/material.h
         src/model.cc
-        src/model.h src/render_context.cc src/render_context.h)
+        src/model.h
+        src/render_context.cc
+        src/render_context.h src/window_manager.cc src/window_manager.h src/gui.cc src/gui.h)
 
 add_subdirectory(external)
 

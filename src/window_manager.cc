@@ -88,6 +88,7 @@ WindowManager::WindowManager(RenderContext& context) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	window_ = glfwCreateWindow(context_->width_, context_->height_, "tinyrt", nullptr, nullptr);
 	if (window_ == nullptr) {
