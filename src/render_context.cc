@@ -11,7 +11,8 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	: width_(width), height_(height), components_(comp), num_threads_(n_threads), max_depth_(max_depth) {
 
 	aspect_ratio_ = float(width_) / height_;
-	camera_ = Camera(glm::vec3(0.0, 1.0, 5.15), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), 26.99, aspect_ratio_);
+	float vfov = 26.99;
+	camera_ = Camera(glm::vec3(0.0, 1.0, 5.15), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), vfov, aspect_ratio_);
 	model_ = LoadObjFile("models/cornellbox/cornellbox.obj", "models/cornellbox");
 
 	rng_.resize(num_threads_);
@@ -32,7 +33,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 
 	std::cout << model_;
 
-	float *vb = (float *)rtcSetNewGeometryBuffer(geom,
+	auto *vb = (float *)rtcSetNewGeometryBuffer(geom,
 												 RTC_BUFFER_TYPE_VERTEX,
 												 0,
 												 RTC_FORMAT_FLOAT3,
@@ -42,7 +43,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 		vb[i] = model_.vertices_[i];
 	}
 
-	unsigned *ib = (unsigned *)rtcSetNewGeometryBuffer(geom,
+	auto *ib = (unsigned *)rtcSetNewGeometryBuffer(geom,
 													   RTC_BUFFER_TYPE_INDEX,
 													   0,
 													   RTC_FORMAT_UINT3,

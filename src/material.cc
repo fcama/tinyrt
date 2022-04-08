@@ -54,8 +54,8 @@ bool EvaluateMaterial(pcg32 &rng,
 			//const float kRefractionRatio = glm::dot(kRayDirection, geomNormal) ? (1.0/kIr) : kIr;
 			const float kRefractionRatio = glm::dot(kRayDirection, kShadingNormal) ? (1.0/kIr) : kIr;
 
-			float cos_theta = fmin(dot(-kRayDirection, kShadingNormal), 1.0f);
-			float sin_theta = sqrt(1.0f - cos_theta*cos_theta);
+			float cos_theta = std::fmin(dot(-kRayDirection, kShadingNormal), 1.0f);
+			float sin_theta = std::sqrt(1.0f - cos_theta*cos_theta);
 
 			bool cannot_refract = kRefractionRatio * sin_theta > 1.0;
 
@@ -102,11 +102,13 @@ glm::vec3 Material::evaluatePattern(const RTCRayHit &ray_hit) const {
 											ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
 											ray_hit.ray.org_z + ray_hit.ray.tfar * ray_hit.ray.dir_z);
 
-			auto sines = sin(10*hit_point.x)*sin(10*hit_point.y)*sin(10*hit_point.z);
+			float sines = std::sin(10*hit_point.x)*std::sin(10*hit_point.y)*std::sin(10*hit_point.z);
 			if (sines < 0)
 				return odd;
 			else
 				return even;
 		}
 	}
+
+	return glm::vec3(1,0,1);
 }
