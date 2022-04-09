@@ -17,23 +17,16 @@ int main() {
 	sp.use();
 	sp.setInt("screenTexture", 0);
 
-	while (!glfwWindowShouldClose(window_manager.window_)) {
-		glfwPollEvents();
+	while (!window_manager.shouldClose()) {
+
 		window_manager.processInput(gui.getFrameTime());
 
-		gui.showDebugView();
-
-		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		context.render();
+		context.traceScene();
 
 		sp.setUInt("frame", context.accumulation_frames);
 
 		window_manager.renderFrame();
-
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+		gui.showDebugView();
 		glfwSwapBuffers(window_manager.window_);
 
 		++context.accumulation_frames;

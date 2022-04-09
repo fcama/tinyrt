@@ -54,8 +54,9 @@ void Gui::showDebugView() {
 		render_context_->accumulation_frames = 1;
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	}
-	
+
 	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 float Gui::getFrameTime() {
 	return 1000.0f / ImGui::GetIO().Framerate;

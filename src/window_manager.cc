@@ -43,6 +43,8 @@ void WindowManager::processMouse() {
 }
 
 void WindowManager::processInput(float delta_time) {
+	glfwPollEvents();
+
 	if (glfwGetKey(window_, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window_, true);
 
@@ -151,6 +153,9 @@ WindowManager::WindowManager(RenderContext& context) {
 }
 
 void WindowManager::renderFrame() const {
+	glClearColor(1, 0, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	// Update texture
 	glTexSubImage2D(GL_TEXTURE_2D,
 					0,
@@ -170,5 +175,9 @@ void WindowManager::renderFrame() const {
 WindowManager::~WindowManager() {
 	glfwDestroyWindow(window_);
 	glfwTerminate();
+}
+
+bool WindowManager::shouldClose() const {
+	return glfwWindowShouldClose(window_);
 }
 

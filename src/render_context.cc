@@ -274,7 +274,7 @@ glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 
 	return glm::vec3(aoIntensity / (float)kAoSamples);
 }
-void RenderContext::render() {
+void RenderContext::traceScene() {
 
 	switch (current_output_) {
 		case (RenderOutput::CAMERA) : {

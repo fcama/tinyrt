@@ -27,6 +27,7 @@ class WindowManager {
 	void renderFrame() const;
 	void processMouse();
 	void processInput(float delta_time);
+	bool shouldClose() const;
 };
 
 #endif //TINYRT_SRC_WINDOW_MANAGER_H_

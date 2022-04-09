@@ -19,7 +19,7 @@ class RenderContext {
  public:
 	RenderContext(int width, int height, int comp  = 3, int n_threads = omp_get_max_threads(), int max_depth = 5);
 
-	void render();
+	void traceScene();
 	template <class F>
 	void render(std::vector<float> &target, F rayTarget)
 	{
