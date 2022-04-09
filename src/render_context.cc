@@ -6,6 +6,7 @@
 #include "render_context.h"
 #include "common.h"
 #include <memory>
+#include <algorithm>
 
 RenderContext::RenderContext(int width, int height, int comp, int n_threads, int max_depth)
 	: width_(width), height_(height), components_(comp), num_threads_(n_threads), max_depth_(max_depth) {
@@ -109,6 +110,14 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 
 		pixel_color += emitted * throughput;
 		throughput *= albedo;
+
+		// Russian Roulette
+		float survival_rate = std::max(throughput.r, std::max(throughput.g, throughput.b));
+		if (rng.nextFloat() > survival_rate)
+			break;
+		// Add the energy we 'lose' by randomly terminating paths
+		throughput *= 1.0f / survival_rate;
+
 
 		cur_ray = scattered;
 	}
