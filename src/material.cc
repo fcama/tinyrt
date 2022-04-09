@@ -10,19 +10,19 @@
 /* @param \in RTCRayHit  - Embree RayHit structure of incoming ray */
 /* @param \in Material   - Material of the triangle hit by the incoming ray */
 /* @param \out Ray       - The scattered ray */
-/* @param \out vec3      - The color of the triangle hit */
+/* @param \out vec3      - The albedo of the triangle hit */
 /*                                           */
 /* @return true if a scattered ray is generated, false otherwise */
 bool EvaluateMaterial(pcg32 &rng,
 					  const RTCRayHit &ray_hit,
 					  const Material &mat,
 					  Ray &scattered,
-					  glm::vec3 &color) {
+					  glm::vec3 &albedo) {
 	
 	const glm::vec3 kGeometryNormal = glm::vec3(ray_hit.hit.Ng_x, ray_hit.hit.Ng_y, ray_hit.hit.Ng_z);
 	const glm::vec3 kShadingNormal = graphics::CalcShadingNormal(glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z), kGeometryNormal);
 
-	color = mat.evaluatePattern(ray_hit);
+	albedo = mat.evaluatePattern(ray_hit);
 
 	glm::vec3 hit_point = glm::vec3(ray_hit.ray.org_x + ray_hit.ray.tfar * ray_hit.ray.dir_x,
 								  ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
@@ -47,7 +47,7 @@ bool EvaluateMaterial(pcg32 &rng,
 		case MatType::DIELECTRIC:
 		{
 			// DIELECTRIC default color is white
-			color = glm::vec3(1);
+			albedo = glm::vec3(1);
 			constexpr float kIr = 1.5f;
 
 			const glm::vec3 kRayDirection = glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z);

@@ -69,7 +69,9 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 
 glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 	Ray cur_ray = ray;
-	glm::vec3 cur_attenuation(1.0f);
+
+	glm::vec3 throughput(1.0f);
+	glm::vec3 pixel_color(0.0f);
 
 	for (size_t i = 0; i < max_depth_; ++i) {
 		RTCRayHit rayhit;
@@ -91,8 +93,8 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 
 		// Miss Shader
 		if (rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID) {
-			//return cur_attenuation * glm::vec3(1);
-			return glm::vec3(0);
+			// pixel_color += emitted * throughput;
+			return pixel_color;
 		}
 
 		// Fetch current material
@@ -102,17 +104,17 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 									  mat.tiny_material_->emission[2]);
 
 		Ray scattered;
-		glm::vec3 color;
-		// No scattering -> emissive material
-		if (!EvaluateMaterial(rng, rayhit, mat, scattered, color)) {
-			return cur_attenuation * emitted;
-		}
+		glm::vec3 albedo;
 
-		cur_attenuation *= color; // emitted + color
+		EvaluateMaterial(rng, rayhit, mat, scattered, albedo);
+
+		pixel_color += emitted * throughput;
+		throughput *= albedo;
+
 		cur_ray = scattered;
 	}
 
-	return glm::vec3(0); // exceeded recursion
+	return pixel_color;
 }
 
 glm::vec3 RenderContext::rayNormal(pcg32 &rng, const Ray &ray) {

@@ -27,6 +27,6 @@ class Material {
 	[[nodiscard]] glm::vec3 evaluatePattern(const RTCRayHit &ray_hit) const;
 };
 
-bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &color);
+bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &albedo);
 
 #endif //TINYRT_SRC_MATERIAL_H_
