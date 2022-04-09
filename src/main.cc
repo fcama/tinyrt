@@ -26,7 +26,7 @@ int main() {
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		context.render(context.accumulation_buffer);
+		context.render();
 
 		sp.setUInt("frame", context.accumulation_frames);
 

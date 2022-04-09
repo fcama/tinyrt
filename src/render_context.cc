@@ -63,7 +63,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	current_output_ = RenderOutput::CAMERA;
 
 	accumulation_frames = 1;
-	accumulation_buffer.resize(width_ * height_ * components_, 0.f);
+	accumulation_buffer_.resize(width_ * height_ * components_, 0.f);
 
 }
 
@@ -173,7 +173,7 @@ glm::vec3 RenderContext::rayBarycentrics(pcg32 &rng, const Ray &ray) {
 	return barycentrics;
 }
 
-glm::vec3 RenderContext::rayAO(pcg32 &rng, const Ray &ray) {
+glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 	// Settings
 	static constexpr int kAoSamples = 8;
 
@@ -274,23 +274,23 @@ glm::vec3 RenderContext::rayAO(pcg32 &rng, const Ray &ray) {
 
 	return glm::vec3(aoIntensity / (float)kAoSamples);
 }
-void RenderContext::render(std::vector<float> &target) {
+void RenderContext::render() {
 
 	switch (current_output_) {
 		case (RenderOutput::CAMERA) : {
-			render(target, [&](pcg32 &rng, Ray &r) { return rayColor(rng, r); });
+			render(accumulation_buffer_, [&](pcg32 &rng, Ray &r) { return rayColor(rng, r); });
 			break;
 		}
 		case (RenderOutput::NORMALS) : {
-			render(target, [&](pcg32 &rng, Ray &r) { return rayNormal(rng, r); });
+			render(accumulation_buffer_, [&](pcg32 &rng, Ray &r) { return rayNormal(rng, r); });
 			break;
 		}
 		case (RenderOutput::BARYCENTRICS) : {
-			render(target, [&](pcg32 &rng, Ray &r) { return rayBarycentrics(rng, r); });
+			render(accumulation_buffer_, [&](pcg32 &rng, Ray &r) { return rayBarycentrics(rng, r); });
 			break;
 		}
 		case (RenderOutput::AMBIENT_OCCLUSION) : {
-			render(target, [&](pcg32 &rng, Ray &r) { return rayAO(rng, r); });
+			render(accumulation_buffer_, [&](pcg32 &rng, Ray &r) { return rayAo(rng, r); });
 			break;
 		}
 

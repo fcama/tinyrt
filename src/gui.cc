@@ -40,19 +40,19 @@ void Gui::showDebugView() {
 	if (ImGui::RadioButton("Camera", render_context_->current_output_ == RenderOutput::CAMERA)) {
 		render_context_->current_output_ = RenderOutput::CAMERA;
 		render_context_->accumulation_frames = 1;
-		std::fill(render_context_->accumulation_buffer.begin(), render_context_->accumulation_buffer.end(), 0.f);
+		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Normals", render_context_->current_output_ == RenderOutput::NORMALS)) {
 		render_context_->current_output_ = RenderOutput::NORMALS;
 		render_context_->accumulation_frames = 1;
-		std::fill(render_context_->accumulation_buffer.begin(), render_context_->accumulation_buffer.end(), 0.f);
+		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Barycentrics", render_context_->current_output_ == RenderOutput::BARYCENTRICS)) {
 		render_context_->current_output_ = RenderOutput::BARYCENTRICS;
 		render_context_->accumulation_frames = 1;
-		std::fill(render_context_->accumulation_buffer.begin(), render_context_->accumulation_buffer.end(), 0.f);
+		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Ambient Occlusion", render_context_->current_output_ == RenderOutput::AMBIENT_OCCLUSION)) {
 		render_context_->current_output_ = RenderOutput::AMBIENT_OCCLUSION;
 		render_context_->accumulation_frames = 1;
-		std::fill(render_context_->accumulation_buffer.begin(), render_context_->accumulation_buffer.end(), 0.f);
+		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	}
 	
 	ImGui::Render();

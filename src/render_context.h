@@ -19,7 +19,7 @@ class RenderContext {
  public:
 	RenderContext(int width, int height, int comp  = 3, int n_threads = omp_get_max_threads(), int max_depth = 5);
 
-	void render(std::vector<float> &target);
+	void render();
 	template <class F>
 	void render(std::vector<float> &target, F rayTarget)
 	{
@@ -47,12 +47,12 @@ class RenderContext {
 	glm::vec3 rayColor(pcg32 &rng, const Ray& ray);
 	glm::vec3 rayNormal(pcg32 &rng, const Ray& ray);
 	glm::vec3 rayBarycentrics(pcg32 &rng, const Ray& ray);
-	glm::vec3 rayAO(pcg32 &rng, const Ray& ray);
+	glm::vec3 rayAo(pcg32 &rng, const Ray& ray);
 
 	int width_, height_, components_, num_threads_, max_depth_;
 	float aspect_ratio_;
 	uint32_t accumulation_frames;
-	std::vector<float> accumulation_buffer;
+	std::vector<float> accumulation_buffer_;
 
 	Camera camera_;
 	Model model_;

@@ -33,7 +33,7 @@ void WindowManager::processMouse() {
 
 		context_->camera_.processMouseMovement(xoffset, yoffset);
 		context_->accumulation_frames = 1;
-		std::fill(context_->accumulation_buffer.begin(), context_->accumulation_buffer.end(), 0.f);
+		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	else
 	{
@@ -49,22 +49,22 @@ void WindowManager::processInput(float delta_time) {
 	if (glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::FORWARD, delta_time);
 		context_->accumulation_frames = 1;
-		std::fill(context_->accumulation_buffer.begin(), context_->accumulation_buffer.end(), 0.f);
+		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::BACKWARD, delta_time);
 		context_->accumulation_frames = 1;
-		std::fill(context_->accumulation_buffer.begin(), context_->accumulation_buffer.end(), 0.f);
+		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::LEFT, delta_time);
 		context_->accumulation_frames = 1;
-		std::fill(context_->accumulation_buffer.begin(), context_->accumulation_buffer.end(), 0.f);
+		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::RIGHT, delta_time);
 		context_->accumulation_frames = 1;
-		std::fill(context_->accumulation_buffer.begin(), context_->accumulation_buffer.end(), 0.f);
+		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 
 	processMouse();
@@ -89,6 +89,7 @@ WindowManager::WindowManager(RenderContext& context) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
 
 	window_ = glfwCreateWindow(context_->width_, context_->height_, "tinyrt", nullptr, nullptr);
 	if (window_ == nullptr) {
@@ -159,7 +160,7 @@ void WindowManager::renderFrame() const {
 					context_->height_,
 					GL_RGB,
 					GL_FLOAT,
-					(const void *)context_->accumulation_buffer.data());
+					(const void *)context_->accumulation_buffer_.data());
 
 	glBindVertexArray(quadVAO);
 	glBindTexture(GL_TEXTURE_2D, texture_colorbuffer);
