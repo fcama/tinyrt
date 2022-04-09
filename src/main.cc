@@ -23,13 +23,16 @@ int main() {
 
 		context.traceScene();
 
-		sp.setUInt("frame", context.accumulation_frames);
+		sp.setUInt("frame", context.accumulation_frames_);
+		sp.setFloat("exposure", context.exposure_);
+		sp.setBool("tone_mapping", context.do_tonemapping_);
+		sp.setBool("sRGB_conversion", context.do_SRGB_conversion_);
 
 		window_manager.renderFrame();
 		gui.showDebugView();
 		glfwSwapBuffers(window_manager.window_);
 
-		++context.accumulation_frames;
+		++context.accumulation_frames_;
 	}
 
 

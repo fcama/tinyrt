@@ -32,7 +32,7 @@ void WindowManager::processMouse() {
 
 
 		context_->camera_.processMouseMovement(xoffset, yoffset);
-		context_->accumulation_frames = 1;
+		context_->accumulation_frames_ = 1;
 		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	else
@@ -50,22 +50,22 @@ void WindowManager::processInput(float delta_time) {
 
 	if (glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::FORWARD, delta_time);
-		context_->accumulation_frames = 1;
+		context_->accumulation_frames_ = 1;
 		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::BACKWARD, delta_time);
-		context_->accumulation_frames = 1;
+		context_->accumulation_frames_ = 1;
 		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::LEFT, delta_time);
-		context_->accumulation_frames = 1;
+		context_->accumulation_frames_ = 1;
 		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 	if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
 		context_->camera_.processKeyboard(CameraMovement::RIGHT, delta_time);
-		context_->accumulation_frames = 1;
+		context_->accumulation_frames_ = 1;
 		std::fill(context_->accumulation_buffer_.begin(), context_->accumulation_buffer_.end(), 0.f);
 	}
 

@@ -25,7 +25,7 @@ Gui::~Gui() {
 	ImGui::DestroyContext();
 }
 
-void Gui::showDebugView() {
+void Gui::showDebugView() const {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -34,24 +34,30 @@ void Gui::showDebugView() {
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 				1000.0f / ImGui::GetIO().Framerate,
 				ImGui::GetIO().Framerate);
-	ImGui::Text("Frame count: %d", render_context_->accumulation_frames);
+	ImGui::Text("Frame count: %d", render_context_->accumulation_frames_);
+
+	ImGui::Text("\n");
+	ImGui::SliderFloat("Exposure", &render_context_->exposure_, 0.0f, 1.0f);
+
+	ImGui::Checkbox("ToneMapping", &render_context_->do_tonemapping_);
+	ImGui::Checkbox("Convert to sRGB", &render_context_->do_SRGB_conversion_);
 
 	ImGui::Text("\nDebug View");
 	if (ImGui::RadioButton("Camera", render_context_->current_output_ == RenderOutput::CAMERA)) {
 		render_context_->current_output_ = RenderOutput::CAMERA;
-		render_context_->accumulation_frames = 1;
+		render_context_->accumulation_frames_ = 1;
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Normals", render_context_->current_output_ == RenderOutput::NORMALS)) {
 		render_context_->current_output_ = RenderOutput::NORMALS;
-		render_context_->accumulation_frames = 1;
+		render_context_->accumulation_frames_ = 1;
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Barycentrics", render_context_->current_output_ == RenderOutput::BARYCENTRICS)) {
 		render_context_->current_output_ = RenderOutput::BARYCENTRICS;
-		render_context_->accumulation_frames = 1;
+		render_context_->accumulation_frames_ = 1;
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	} else if (ImGui::RadioButton("Ambient Occlusion", render_context_->current_output_ == RenderOutput::AMBIENT_OCCLUSION)) {
 		render_context_->current_output_ = RenderOutput::AMBIENT_OCCLUSION;
-		render_context_->accumulation_frames = 1;
+		render_context_->accumulation_frames_ = 1;
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	}
 

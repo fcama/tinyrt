@@ -62,7 +62,7 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 
 	current_output_ = RenderOutput::CAMERA;
 
-	accumulation_frames = 1;
+	accumulation_frames_ = 1;
 	accumulation_buffer_.resize(width_ * height_ * components_, 0.f);
 
 }
@@ -93,8 +93,7 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 
 		// Miss Shader
 		if (rayhit.hit.geomID == RTC_INVALID_GEOMETRY_ID) {
-			// pixel_color += emitted * throughput;
-			return pixel_color;
+			break;
 		}
 
 		// Fetch current material
@@ -207,7 +206,7 @@ glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 	const glm::vec3 shadingNorm =
 		graphics::CalcShadingNormal(glm::vec3(rayhit.ray.dir_x, rayhit.ray.dir_y, rayhit.ray.dir_z), geomNormal);
 
-	unsigned aoIntensity{0};
+	unsigned ao_intensity{0};
 
 	assert(kAoSamples % 8 == 0);
 
@@ -240,7 +239,7 @@ glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 
 		for (int ao = 0; ao < simdSize; ++ao) {
 			if (rayVector->tfar[ao] >= 0.f) {
-				aoIntensity += 1;
+				ao_intensity += 1;
 			}
 		}
 	}
@@ -272,7 +271,7 @@ glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 	//     }
 	// }
 
-	return glm::vec3(aoIntensity / (float)kAoSamples);
+	return glm::vec3(ao_intensity / (float)kAoSamples);
 }
 void RenderContext::traceScene() {
 

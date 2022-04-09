@@ -51,7 +51,10 @@ class RenderContext {
 
 	int width_, height_, components_, num_threads_, max_depth_;
 	float aspect_ratio_;
-	uint32_t accumulation_frames;
+	uint32_t accumulation_frames_;
+	float exposure_ = 1.0f;
+	bool do_tonemapping_ = true;
+	bool do_SRGB_conversion_ = true;
 	std::vector<float> accumulation_buffer_;
 
 	Camera camera_;

@@ -19,7 +19,7 @@ class Gui {
 
 	~Gui();
 
-	void showDebugView();
+	void showDebugView() const;
 	float getFrameTime();
 
 	WindowManager *window_manager_;
