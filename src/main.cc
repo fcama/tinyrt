@@ -19,7 +19,7 @@ int main() {
 
 	while (!window_manager.shouldClose()) {
 
-		window_manager.processInput(gui.getFrameTime());
+		window_manager.processInput(Gui::getFrameTime());
 
 		context.traceScene();
 

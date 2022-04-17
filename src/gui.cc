@@ -61,6 +61,7 @@ void Gui::showDebugView() const {
 		std::fill(render_context_->accumulation_buffer_.begin(), render_context_->accumulation_buffer_.end(), 0.f);
 	}
 
+	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
