@@ -2,7 +2,7 @@
 
 Tinyrt is a compact path tracer written in modern C++ supporting real-time features.
 
-<img src="https://user-images.githubusercontent.com/70849941/161048235-8ff199fa-b47b-4706-94ff-48bd29849e48.png" width="700" height="700">
+<img src="https://user-images.githubusercontent.com/70849941/161048235-8ff199fa-b47b-4706-94ff-48bd29849e48.png" width="600" height="600">
 
 ## Building
 This project currently only supports Linux, a Windows port could be considered in the future. \
@@ -23,8 +23,12 @@ cd ..
 
 ## Features
 Tinyrt supports Diffuse, Reflective and Dielectric materials. \
-It comes with a GUI which can be used to set different debug views or control the camera. \
-<img src="https://user-images.githubusercontent.com/70849941/161051198-58a6d640-fd75-4d52-94b7-afbbe1ea2868.png" width="500" height="500"> <img src="https://user-images.githubusercontent.com/70849941/161051203-52bc71fb-4e86-4a9f-b09c-f4aa9955dd36.png" width="500" height="500">
+It comes with a GUI which can be used to set different debug views or options. \
+Move around in the scene by controlling the camera with WASD or by moving your mouse while pressing the scroll wheel.
+<!--- <img src="https://user-images.githubusercontent.com/70849941/161051198-58a6d640-fd75-4d52-94b7-afbbe1ea2868.png" width="500" height="500"> -->
+<img src="https://user-images.githubusercontent.com/70849941/165535916-5f7a0811-462c-4e00-b766-35753e38ab49.png" width="500" height="500">
+
+<img src="https://user-images.githubusercontent.com/70849941/161051203-52bc71fb-4e86-4a9f-b09c-f4aa9955dd36.png" width="500" height="500">
 <img src="https://user-images.githubusercontent.com/70849941/161051206-6482e84d-bdd6-4112-ab07-5c42328150cf.png" width="500" height="500"> <img src="https://user-images.githubusercontent.com/70849941/161271935-14e887d9-4494-4a77-aaad-a49bea2eb3e4.png" width="500" height="500">
 
 ## Progress
