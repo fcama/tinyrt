@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #include "ray.h"
 
-enum class MatType { DIFFUSE = 0, REFLECTIVE, DIELECTRIC, EMISSIVE, INVALID };
+enum class MatType { DIFFUSE = 0, REFLECTIVE, DIELECTRIC, GLOSSY, EMISSIVE, INVALID };
 enum class PatternType { SOLID, CHECKERBOARD };
 
 class Material {
@@ -23,10 +23,19 @@ class Material {
 	const tinyobj::material_t *tiny_material_;
 	PatternType pattern_type_;
 
+	// Glossy Properties
+	// What percentage of the light that hits this object is going to be reflected specularly
+	// instead of diffusely
+	float percent_specular_; //[0,1]
+	// Controls the roughness of the surface, 0 is mirror-like reflection, 1 is fully diffuse
+	float roughness_; //[0,1]
+	// Color of specular reflection
+	glm::vec3 specular_color_;
+
 
 	[[nodiscard]] glm::vec3 evaluatePattern(const RTCRayHit &ray_hit) const;
 };
 
-bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &albedo);
+bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &output_color);
 
 #endif //TINYRT_SRC_MATERIAL_H_

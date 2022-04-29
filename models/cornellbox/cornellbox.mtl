@@ -27,13 +27,13 @@ newmtl shortBox
     Kt 1.0 1.0 1.0
 
 newmtl tallBox
-    Kd 1.0 1.0 1.0
+    Kd 0.1 0.1 0.1
     Ks 1.0 1.0 1.0
     Kt 1.0 1.0 1.0
 
 newmtl light
     Kd 1.0 1.0 1.0
-    Ke 4 4 4
+    Ke 2 2 2
 
 newmtl checker
     Ka 0.2 0.2 0.2

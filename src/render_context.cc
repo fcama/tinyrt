@@ -98,7 +98,7 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 		}
 
 		// Fetch current material
-		Material &mat = model_.materials_.at(rayhit.hit.primID);
+		Material &mat = model_.materials_[rayhit.hit.primID];
 		glm::vec3 emitted = glm::vec3(mat.tiny_material_->emission[0],
 									  mat.tiny_material_->emission[1],
 									  mat.tiny_material_->emission[2]);
@@ -282,6 +282,7 @@ glm::vec3 RenderContext::rayAo(pcg32 &rng, const Ray &ray) {
 
 	return glm::vec3(ao_intensity / (float)kAoSamples);
 }
+
 void RenderContext::traceScene() {
 
 	switch (current_output_) {

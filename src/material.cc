@@ -17,16 +17,16 @@ bool EvaluateMaterial(pcg32 &rng,
 					  const RTCRayHit &ray_hit,
 					  const Material &mat,
 					  Ray &scattered,
-					  glm::vec3 &albedo) {
+					  glm::vec3 &output_color) {
 	
 	const glm::vec3 kGeometryNormal = glm::vec3(ray_hit.hit.Ng_x, ray_hit.hit.Ng_y, ray_hit.hit.Ng_z);
 	const glm::vec3 kShadingNormal = graphics::CalcShadingNormal(glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z), kGeometryNormal);
 
-	albedo = mat.evaluatePattern(ray_hit);
+	glm::vec3 albedo = mat.evaluatePattern(ray_hit);
 
 	glm::vec3 hit_point = glm::vec3(ray_hit.ray.org_x + ray_hit.ray.tfar * ray_hit.ray.dir_x,
 								  ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
-								  ray_hit.ray.org_z + ray_hit.ray.tfar * ray_hit.ray.dir_z);
+								  ray_hit.ray.org_z + ray_hit.ray.tfar * ray_hit.ray.dir_z) + kShadingNormal * glm::vec3(0.001);
 	glm::vec3 direction(0);
 
 	switch(mat.material_type_)
@@ -34,14 +34,13 @@ bool EvaluateMaterial(pcg32 &rng,
 		case MatType::DIFFUSE:
 		{
 			direction = graphics::GetCosHemisphereSample(rng, kShadingNormal);
+			output_color = albedo;
 			break;
 		}
 		case MatType::REFLECTIVE:
 		{
-			// glm::vec3 fuzz(random_in_unit_sphere(rng), random_in_unit_sphere(rng), random_in_unit_sphere(rng));
-			// fuzz *= 0.2; 
 			direction = glm::reflect(glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z), kShadingNormal);
-			// direction += fuzz;
+			output_color = albedo;
 			break;
 		}
 		case MatType::DIELECTRIC:
@@ -64,6 +63,31 @@ bool EvaluateMaterial(pcg32 &rng,
 			else
 				direction = glm::refract(kRayDirection, kShadingNormal, kRefractionRatio);
 
+			output_color = albedo;
+			break;
+		}
+		case MatType::GLOSSY:
+		{
+			// Incoming ray direction
+			const glm::vec3 kRayDirection = glm::vec3(ray_hit.ray.dir_x, ray_hit.ray.dir_y, ray_hit.ray.dir_z);
+			// Do specular reflection
+			bool do_specular = rng.nextFloat() < mat.percent_specular_;
+
+			glm::vec3 diffuse_ray_dir = graphics::GetCosHemisphereSample(rng, kShadingNormal);
+			glm::vec3 specular_ray_dir = glm::reflect(kRayDirection, kShadingNormal);
+			specular_ray_dir = glm::normalize(mix(specular_ray_dir, diffuse_ray_dir, mat.roughness_));
+
+			if(do_specular)
+			{
+				direction = specular_ray_dir;
+				output_color = mat.specular_color_;
+			}
+			// Do a diffuse ray
+			else
+			{
+				direction = diffuse_ray_dir;
+				output_color = albedo;
+			}
 			break;
 		}
 		case MatType::EMISSIVE:

@@ -69,6 +69,16 @@ Model LoadObjFile(const char* filename, const char* basepath, bool triangulate)
 							 PatternType::CHECKERBOARD);
 				m.materials_.push_back(mat);
 			}
+			else if (shape.name == "tallBox_Mesh")
+			{
+				Material mat(MatType::GLOSSY,
+							 &m.tiny_materials_.at(shape.mesh.material_ids[f]),
+							 PatternType::SOLID);
+				mat.percent_specular_ = 0.3f;
+				mat.roughness_ = 0.05f;
+				mat.specular_color_ = glm::vec3(0.9f);
+				m.materials_.push_back(mat);
+			}
 			else if (shape.name == "light_Mesh")
 			{
 				Material mat(MatType::EMISSIVE, &m.tiny_materials_.at(shape.mesh.material_ids[f]));
