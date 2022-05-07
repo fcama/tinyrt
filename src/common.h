@@ -10,6 +10,8 @@
 #include <pcg32/pcg32.h>
 #include <cstdio>
 
+namespace graphics
+{
 
 inline glm::vec3 RandomInUnitSphere(pcg32 &rng) {
 	while (true) {
@@ -29,13 +31,26 @@ inline glm::vec3 RandomInUnitDisk(pcg32 &rng) {
 	}
 }
 
-namespace graphics
+inline glm::vec3 LessThan(glm::vec3 f, float value)
 {
-
-[[nodiscard]] inline glm::vec3 FaceForward(const glm::vec3& dir, const glm::vec3& ng)
-{
-	return glm::dot(dir, ng) < 0.0f ? ng : -ng;
+	return {
+		(f.x < value) ? 1.0f : 0.0f,
+		(f.y < value) ? 1.0f : 0.0f,
+		(f.z < value) ? 1.0f : 0.0f
+	};
 }
+
+inline glm::vec3 SRGBToLinear(glm::vec3 rgb)
+{
+	rgb = clamp(rgb, 0.0f, 1.0f);
+
+	return mix(
+		pow(((rgb + 0.055f) / 1.055f), glm::vec3(2.4f)),
+		rgb / 12.92f,
+		LessThan(rgb, 0.04045f)
+	);
+}
+
 
 // Utility function to get a vector perpendicular to an input vector
 //    (from "Efficient Construction of Perpendicular Vectors Without Branching")
@@ -62,12 +77,16 @@ namespace graphics
 	float phi = 2.0f * 3.14159265f * rand_val.y;
 
 	// Get our cosine-weighted hemisphere lobe sample direction
-	return tangent * glm::vec3(r * std::cos(phi)) + bitangent * glm::vec3(r * std::sin(phi)) + hit_norm * glm::vec3(sqrt(1 - rand_val.x));
+	return tangent * glm::vec3(r * std::cos(phi)) + bitangent * glm::vec3(r * std::sin(phi)) + hit_norm * glm::vec3(std::sqrt(1 - rand_val.x));
 }
 
 [[nodiscard]] inline glm::vec3 CalcShadingNormal(const glm::vec3 &ray, const glm::vec3 &geom_normal)
 {
-	return FaceForward(ray, glm::normalize(geom_normal));
+	auto ret = glm::normalize(geom_normal);
+	if (glm::dot(ray, geom_normal) < 0)
+		return ret;
+
+	return -ret;
 }
 
 [[nodiscard]] inline float Shlick(float cosine, float ref_idx) {

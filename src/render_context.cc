@@ -13,8 +13,15 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 
 	aspect_ratio_ = float(width_) / height_;
 	float vfov = 26.99;
+	//float vfov = 45.f;
 	camera_ = Camera(glm::vec3(0.0, 1.0, 5.15), glm::vec3(0, 1, 0), glm::vec3(0, 1, 0), vfov, aspect_ratio_);
-	model_ = LoadObjFile("models/cornellbox/cornellbox.obj", "models/cornellbox");
+	model_ = LoadObjFile("models/cornellbox/cornellbox.obj", "models/cornellbox/");
+//	model_ = LoadObjFile("models/sponza/sponza.obj", "models/sponza/");
+//	for (auto &vertex : model_.vertices_)
+//	{
+//		vertex *= 0.001;
+//	}
+
 
 	rng_.resize(num_threads_);
 	std::vector<uint64_t> initstate(num_threads_, PCG32_DEFAULT_STATE);
@@ -24,7 +31,6 @@ RenderContext::RenderContext(int width, int height, int comp, int n_threads, int
 	}
 	for (int i = 0; i < num_threads_; ++i) {
 		rng_[i].seed(initstate[i], initseq[i]);
-		//rng_[i].init(initstate[i], initseq[i]);
 	}
 
 	// Embree code
@@ -99,17 +105,31 @@ glm::vec3 RenderContext::rayColor(pcg32 &rng, const Ray &ray) {
 
 		// Fetch current material
 		Material &mat = model_.materials_[rayhit.hit.primID];
+
+		int face_id = rayhit.hit.primID;
+		std::vector<glm::vec3> triangle(3);
+		std::vector<glm::vec2> uvs(3);
+		glm::ivec3 tri_indices(model_.indices_[face_id * 3], model_.indices_[face_id * 3 + 1], model_.indices_[face_id * 3 + 2]);
+		for (int i = 0; i < 3; ++i)
+		{
+			int index = tri_indices[i] * 3;
+			triangle[i] = {model_.vertices_[index], model_.vertices_[index+1], model_.vertices_[index+2]};
+			int tex_idx = face_id*4 + 2*i;
+			uvs[i] = {model_.tex_coords_[tex_idx], model_.tex_coords_[tex_idx + 1]};
+		}
+
+
 		glm::vec3 emitted = glm::vec3(mat.tiny_material_->emission[0],
 									  mat.tiny_material_->emission[1],
 									  mat.tiny_material_->emission[2]);
 
 		Ray scattered;
-		glm::vec3 albedo;
+		glm::vec3 output_color;
 
-		EvaluateMaterial(rng, rayhit, mat, scattered, albedo);
+		EvaluateMaterial(rng, rayhit, uvs, mat, scattered, output_color);
 
 		pixel_color += emitted * throughput;
-		throughput *= albedo;
+		throughput *= output_color;
 
 		// Russian Roulette
 		float survival_rate = std::max(throughput.r, std::max(throughput.g, throughput.b));

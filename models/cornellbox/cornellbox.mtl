@@ -7,10 +7,10 @@ newmtl white
     Kd 1.0 1.0 1.0
 
 newmtl leftWall
-    Kd 1.0 0.0 0.0
+    Kd 0.6 0.0 0.0
 
 newmtl rightWall
-    Kd 0.0 1.0 0.0
+    Kd 0.0 0.6 0.0
 
 newmtl floor
     Kd 1.0 1.0 1.0
@@ -20,6 +20,7 @@ newmtl ceiling
 
 newmtl frontWall
     Kd 1.0 1.0 1.0
+    map_Kd textures/cornell_diffuse.jpg
 
 newmtl shortBox
     Kd 1.0 1.0 1.0

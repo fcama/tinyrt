@@ -17,9 +17,12 @@ class Model {
 	std::vector<unsigned> indices_;
 	std::vector<float> vertices_;
 	std::vector<float> normals_;
+	std::vector<float> tex_coords_;
 	std::vector<tinyobj::material_t> tiny_materials_;
 	std::vector<Material> materials_;
 	std::vector<tinyobj::shape_t> shapes_;
+
+	std::string path_;
 
 	friend std::ostream& operator<<(std::ostream& os, const Model& m);
 };

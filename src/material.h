@@ -14,6 +14,12 @@
 enum class MatType { DIFFUSE = 0, REFLECTIVE, DIELECTRIC, GLOSSY, EMISSIVE, INVALID };
 enum class PatternType { SOLID, CHECKERBOARD };
 
+struct Texture
+{
+	unsigned char * data = nullptr;
+	int width, height, comp;
+};
+
 class Material {
  public:
 	Material(MatType material_type, const tinyobj::material_t *tiny_material, PatternType pattern_type = PatternType::SOLID)
@@ -32,10 +38,12 @@ class Material {
 	// Color of specular reflection
 	glm::vec3 specular_color_;
 
+	// diffuse texture
+	Texture* tex_diffuse_ = nullptr;
 
 	[[nodiscard]] glm::vec3 evaluatePattern(const RTCRayHit &ray_hit) const;
 };
 
-bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, const Material &mat, Ray &scattered, glm::vec3 &output_color);
+bool EvaluateMaterial(pcg32& rng, const RTCRayHit& ray_hit, std::vector<glm::vec2> &uvs, const Material &mat, Ray &scattered, glm::vec3 &output_color);
 
 #endif //TINYRT_SRC_MATERIAL_H_

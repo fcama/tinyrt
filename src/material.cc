@@ -5,6 +5,42 @@
 #include "material.h"
 #include "common.h"
 
+glm::vec3 get(int x, int y, const Texture *texture)
+{
+	int index = (x + y * texture->width) * texture->comp;
+	glm::vec3 sampled_color(texture->data[index]/255.f, texture->data[index+1]/255.f, texture->data[index+2]/255.f);
+
+	return graphics::SRGBToLinear(sampled_color) * 2.f; // Convert to Linear space and increase brightness
+}
+
+glm::ivec2 interpolateUvs(const glm::vec3 &barycentric, std::vector<glm::vec2> &uvs)
+{
+	glm::ivec2 uv(0);
+	for (int i = 0; i < 3; ++i)
+	{
+		uv.x += int(barycentric[i] * uvs[i].x);
+		uv.y += int(barycentric[i] * uvs[i].y);
+	}
+
+	return uv;
+}
+
+glm::vec3 sampleTexture(const Texture *texture, std::vector<glm::vec2> &uvs, const RTCRayHit &ray_hit)
+{
+	glm::vec3 barycentric(1-ray_hit.hit.u-ray_hit.hit.v, ray_hit.hit.u, ray_hit.hit.v);
+	// Scale uvs
+	for (auto &uv : uvs)
+	{
+		// scale width and height
+		uv.x *= texture->width;
+		uv.y *= texture->height;
+	}
+
+	auto uv = interpolateUvs(barycentric, uvs);
+
+	return get(uv.x, uv.y, texture);
+}
+
 /* Evaluates the material hit and creates a scattered ray */
 /* @param \in rng Random - Number Generator */
 /* @param \in RTCRayHit  - Embree RayHit structure of incoming ray */
@@ -15,6 +51,7 @@
 /* @return true if a scattered ray is generated, false otherwise */
 bool EvaluateMaterial(pcg32 &rng,
 					  const RTCRayHit &ray_hit,
+					  std::vector<glm::vec2> &uvs,
 					  const Material &mat,
 					  Ray &scattered,
 					  glm::vec3 &output_color) {
@@ -34,7 +71,8 @@ bool EvaluateMaterial(pcg32 &rng,
 		case MatType::DIFFUSE:
 		{
 			direction = graphics::GetCosHemisphereSample(rng, kShadingNormal);
-			output_color = albedo;
+			output_color = mat.tex_diffuse_ == nullptr ? albedo : sampleTexture(mat.tex_diffuse_, uvs, ray_hit);
+
 			break;
 		}
 		case MatType::REFLECTIVE:
@@ -120,8 +158,6 @@ glm::vec3 Material::evaluatePattern(const RTCRayHit &ray_hit) const {
 			auto &odd = diffuse;
 			auto &even = ambient;
 
-//			auto &u = ray_hit.hit.u;
-//			auto &v = ray_hit.hit.v;
 			glm::vec3 hit_point = glm::vec3(ray_hit.ray.org_x + ray_hit.ray.tfar * ray_hit.ray.dir_x,
 											ray_hit.ray.org_y + ray_hit.ray.tfar * ray_hit.ray.dir_y,
 											ray_hit.ray.org_z + ray_hit.ray.tfar * ray_hit.ray.dir_z);
